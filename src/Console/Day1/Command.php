@@ -56,7 +56,7 @@ final class Command extends SymfonyCommand
                     $basementIndex = $index + 1;
                 }
             },
-            $instructions
+            $instructions,
         );
 
         return compact('finalLevel', 'basementIndex');
