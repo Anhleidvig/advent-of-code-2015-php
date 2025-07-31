@@ -24,7 +24,7 @@ final class Application extends Container implements ApplicationContract
     ) {
         $this->registerBaseBindings();
 
-        $this->setHasbeenBootstrapped();
+        $this->setHasBeenBootstrapped();
     }
 
     /**
@@ -130,5 +130,10 @@ final class Application extends Container implements ApplicationContract
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    public function setHasBeenBootstrapped(): void
+    {
+        $this->hasBeenBootstrapped = true;
     }
 }
