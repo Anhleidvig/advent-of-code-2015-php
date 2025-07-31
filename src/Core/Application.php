@@ -85,9 +85,9 @@ final class Application extends Container implements ApplicationContract
         $this->storagePath = $this->basePath('storage');
     }
 
-    protected function path(string $name, string $path = ''): string
+    protected function path(string $basePath, string $path = ''): string
     {
-        return Str::make($this->{$name})
+        return Str::make($basePath)
             ->rightTrim('\/')
             ->appendIf(
                 Str::make($path)
@@ -99,22 +99,17 @@ final class Application extends Container implements ApplicationContract
 
     public function basePath(string $path = ''): string
     {
-        return $this->path('basePath', $path);
+        return $this->path($this->basePath, $path);
     }
 
     public function bootstrapPath(string $path = ''): string
     {
-        return $this->path('bootstrapPath', $path);
+        return $this->path($this->bootstrapPath, $path);
     }
 
     public function storagePath(string $path = ''): string
     {
-        return $this->path('storagePath', $path);
-    }
-
-    public function setHasbeenBootstrapped(): void
-    {
-        $this->hasBeenBootstrapped = true;
+        return $this->path($this->storagePath, $path);
     }
 
     public function hasBeenBootstrapped(): bool
