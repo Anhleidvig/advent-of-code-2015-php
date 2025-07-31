@@ -38,7 +38,7 @@ Execute a specific day's solution with ease:
 php aoc2015 day-{N} day-{N}-input.txt
 ```
 
-Replace `{N}` with the day number (e.g., `day-1` for Day 1). The command reads the input file and outputs the solution. Simple, yet powerful! 💪
+Replace `{N}` with the day number (e.g., `day-1` for Day 1). The command reads the input file and outputs the solution.
 
 Example:
 ```bash
@@ -53,7 +53,7 @@ Ensure everything works as expected with unit tests:
 composer tests
 ```
 
-This runs the test suite to validate the solutions. Keep the codebase rock-solid! 🛡️
+This runs the test suite to validate the solutions.
 
 ## 📂 Project Structure
 
