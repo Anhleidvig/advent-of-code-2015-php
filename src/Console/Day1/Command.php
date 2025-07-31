@@ -2,9 +2,10 @@
 
 namespace App\Console\Day1;
 
-use Closure;
 use Exception;
+use Generator;
 use App\Core\Facades\App;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,71 +17,58 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 )]
 final class Command extends SymfonyCommand
 {
-    protected const int START_LEVEL = 0;
-    protected const int BASEMENT_LEVEL = -1;
-    protected const string INSTRUCTION_LEVEL_UP = '(';
-    protected const string INSTRUCTION_LEVEL_DOWN = ')';
-
     protected const int CHUNK_SIZE = 8000;
     protected const string INPUT_FILE_NAME = 'day-1-input.txt';
 
     protected const string SOLUTION_1_MESSAGE = "The final level is: %d";
     protected const string SOLUTION_2_MESSAGE = "The index of the first instruction leading to basement (%d) is: %d";
 
+    public function __construct(
+        private InstructionSolverInterface $instructionSolver,
+    ) {
+        parent::__construct();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $instructions = $this->readInputFile();
+        $finalLevel = 0;
+        $basementIndex = null;
+        $solver = $this->getInstructionSolver();
+        $inputFilePath = App::storagePath(static::INPUT_FILE_NAME);
+        $chunkSize = static::CHUNK_SIZE;
 
-        $results = $this->solve($instructions, $output);
+        foreach (static::inputFileChunk($inputFilePath, $chunkSize) as $buffer) {
+            $solver->setInstructions($buffer);
 
-        $output->writeln(sprintf(
-            static::SOLUTION_1_MESSAGE,
-            $results['finalLevel'],
-        ));
-        $output->writeln(sprintf(
-            static::SOLUTION_2_MESSAGE,
-            static::BASEMENT_LEVEL,
-            $results['basementIndex'],
-        ));
+            $finalLevel += $solver->calculateFinalLevel();
+
+            if ($basementIndex === null) {
+                $basementIndex = $solver->findFirstInstructionIndexByLevel(
+                    InstructionSolver::BASEMENT_LEVEL,
+                );
+            }
+        }
+
+        $output->writeln(sprintf(self::SOLUTION_1_MESSAGE, $finalLevel));
+        $output->writeln(sprintf(self::SOLUTION_2_MESSAGE, InstructionSolver::BASEMENT_LEVEL, $basementIndex));
 
         return Command::SUCCESS;
     }
 
-    protected function solve(string $instructions, OutputInterface $output): array
+    /**
+     * This generator method reads the file given by you by $inputFilePath by chunks.
+     * The chunk size is determined by you.
+     *
+     * @param string $inputFilePath
+     * @param int $chunkSize
+     *
+     * @return Generator<string>
+     */
+    protected static function inputFileChunk(string $inputFilePath, int $chunkSize): iterable
     {
-        $basementIndex = null;
-
-        $finalLevel = static::walkInstructions(
-            function (int $currentLvl, int $index) use (&$basementIndex) {
-                if ($currentLvl === static::BASEMENT_LEVEL && is_null($basementIndex)) {
-                    $basementIndex = $index + 1;
-                }
-            },
-            $instructions,
-        );
-
-        return compact('finalLevel', 'basementIndex');
-    }
-
-    protected static function walkInstructions(Closure $callback, string $instructions): int
-    {
-        $currentLevel = static::START_LEVEL;
-
-        for ($i = static::START_LEVEL; $i < strlen($instructions); $i++) {
-            $currentLevel += match ($instructions[$i]) {
-                static::INSTRUCTION_LEVEL_UP => +1,
-                static::INSTRUCTION_LEVEL_DOWN => -1,
-            };
-
-            $callback($currentLevel, $i);
+        if (!$chunkSize) {
+            throw new InvalidArgumentException("Chunk size can not be 0.");
         }
-
-        return $currentLevel;
-    }
-
-    protected function readInputFile(): string
-    {
-        $inputFilePath = App::storagePath(static::INPUT_FILE_NAME);
 
         if (!file_exists($inputFilePath)) {
             throw new Exception("The input file '$inputFilePath' was not found.");
@@ -92,14 +80,21 @@ final class Command extends SymfonyCommand
             throw new Exception("Unable to open input file '$inputFilePath'.");
         }
 
-        $buffer = '';
-
         while (!feof($stream)) {
-            $buffer .= fread($stream, static::CHUNK_SIZE);
+            $buffer = fread($stream, static::CHUNK_SIZE);
+
+            if ($buffer === false) {
+                throw new Exception("Failed to open input file: $inputFilePath");
+            }
+
+            yield $buffer;
         }
 
         fclose($stream);
+    }
 
-        return trim($buffer);
+    protected function getInstructionSolver(): InstructionSolverInterface
+    {
+        return $this->instructionSolver;
     }
 }
