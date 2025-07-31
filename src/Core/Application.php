@@ -27,19 +27,12 @@ final class Application extends Container implements ApplicationContract
         $this->setHasBeenBootstrapped();
     }
 
-    /**
-     * @param Command[] $commands
-     *
-     * @return ApplicationContract
-     */
     public function registerCommands(array $commands): ApplicationContract
     {
         foreach ($commands as $command) {
-            if (!$command instanceof Command) {
-                throw new InvalidArgumentException("Parameter 'commands' must be Command[]");
+            if ($command instanceof Command) {
+                $command->setApplication($this->getConsole());
             }
-
-            $command->setApplication($this->getConsole());
         }
 
         $this->getConsole()->addCommands($commands);

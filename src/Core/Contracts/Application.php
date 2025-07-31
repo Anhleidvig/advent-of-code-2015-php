@@ -10,11 +10,6 @@ interface Application
     public static function make(string $basePath): Application;
 
     public function getConsole(): SymfonyApplication;
-    /**
-    * @param Command[] $commands
-    *
-    * @return Application
-    */
     public function registerCommands(array $commands): Application;
     public function basePath(string $path = ''): string;
     public function bootstrapPath(string $path = ''): string;
