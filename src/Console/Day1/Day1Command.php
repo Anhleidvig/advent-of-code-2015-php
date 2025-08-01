@@ -10,9 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use App\Core\Exceptions\FileNotFoundException;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 #[AsCommand(
     name: 'day-1',
