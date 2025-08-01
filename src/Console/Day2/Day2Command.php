@@ -28,6 +28,7 @@ final class Day2Command extends Command
         $inputFilePath = App::storagePath($fileName);
         /** @var Box $box */
         foreach (static::inputFileChunk($inputFilePath) as $box) {
+            $totalWrappingPaper += $box->getBoxArea() + $box->getPlusArea();
         }
 
         $output->writeln("Total wrapping paper needed: {$totalWrappingPaper} feet².");
