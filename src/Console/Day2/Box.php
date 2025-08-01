@@ -27,4 +27,16 @@ class Box
             $this->height * $this->length
         );
     }
+
+    public function getRibbonLength(): int
+    {
+        $sides = [$this->length, $this->width, $this->height];
+
+        sort($sides);
+
+        $wrapRibbon = 2 * ($sides[0] + $sides[1]);
+        $bow = $this->length * $this->width * $this->height;
+
+        return $wrapRibbon + $bow;
+    }
 }
