@@ -23,14 +23,19 @@ final class Day2Command extends Command
         string $fileName,
         OutputInterface $output,
     ): int {
+        $totalRibbon = 0;
+        $totalWrappingPaper = 0;
         $inputFilePath = App::storagePath($fileName);
         /** @var Box $box */
         foreach (static::inputFileChunk($inputFilePath) as $box) {
         }
 
+        $output->writeln("Total wrapping paper needed: {$totalWrappingPaper} feet².");
+        $output->writeln("Total ribbon needed: {$totalRibbon} feet.");
 
         return Command::SUCCESS;
     }
+
     /**
      * This generator method reads the file given by you by $inputFilePath.
      *
