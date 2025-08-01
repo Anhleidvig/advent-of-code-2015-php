@@ -28,14 +28,19 @@ class Box
         );
     }
 
+    public function getVolume(): int
+    {
+        return $this->length * $this->width * $this->height;
+    }
+
     public function getRibbonLength(): int
     {
         $sides = [$this->length, $this->width, $this->height];
+        $bow = $this->getVolume();
 
         sort($sides);
 
         $wrapRibbon = 2 * ($sides[0] + $sides[1]);
-        $bow = $this->length * $this->width * $this->height;
 
         return $wrapRibbon + $bow;
     }
